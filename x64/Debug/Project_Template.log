@@ -1,18 +1,2 @@
-﻿  glad.c
-  cube.cpp
-  glslprogram.cpp
-  glutils.cpp
-  objmesh.cpp
-C:\Users\midge\Desktop\Uni Modules\Stage 4\Comp3015\Main Coursework\c1-prototype\helper\objmesh.cpp(188,43): warning C4267: '+=': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\midge\Desktop\Uni Modules\Stage 4\Comp3015\Main Coursework\c1-prototype\helper\objmesh.cpp(194,50): warning C4267: '+=': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\midge\Desktop\Uni Modules\Stage 4\Comp3015\Main Coursework\c1-prototype\helper\objmesh.cpp(198,45): warning C4267: '+=': conversion from 'size_t' to 'int', possible loss of data
-  plane.cpp
-  stb_image.cpp
-  teapot.cpp
-  texture.cpp
-  torus.cpp
-  trianglemesh.cpp
-  main.cpp
-  scenebasic_uniform.cpp
-  Generating Code...
-  Project_Template.vcxproj -> C:\Users\midge\Desktop\Uni Modules\Stage 4\Comp3015\Main Coursework\c1-prototype\x64\Debug\Project_Template.exe
+﻿  scenebasic_uniform.cpp
+  Project_Template.vcxproj -> C:\Users\midge\Documents\GitHub\optimised_developer_tool\x64\Debug\Project_Template.exe

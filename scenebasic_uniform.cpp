@@ -16,13 +16,13 @@ using glm::mat4;
 SceneBasic_Uniform::SceneBasic_Uniform() : rotation(0.0f), plane(20.0f, 20.0f, 100, 100){
 
 
-    pigmesh = ObjMesh::load("../c1-prototype/media/pig_triangulated.obj",
+    pigmesh = ObjMesh::load("../optimised_developer_tool/media/pig_triangulated.obj",
         true);
 
-    farmer = ObjMesh::load("../c1-prototype/media/Casual_Male.obj",
+    farmer = ObjMesh::load("../optimised_developer_tool/media/Casual_Male.obj",
         true);
 
-    bluebarn = ObjMesh::load("../c1-prototype/media/barn-low.obj",
+    bluebarn = ObjMesh::load("../optimised_developer_tool/media/barn-low.obj",
         true);
 }
 
