@@ -69,12 +69,21 @@
     <ClCompile Include="helper\stb\stb_image.cpp">
       <Filter>helper\stb</Filter>
     </ClCompile>
+    <ClCompile Include="helper\sphere.cpp">
+      <Filter>helper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shader\basic_uniform.frag">
       <Filter>shaders</Filter>
     </None>
     <None Include="shader\basic_uniform.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shader\edge.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="shader\edge.vert">
       <Filter>shaders</Filter>
     </None>
   </ItemGroup>
@@ -132,6 +141,12 @@
     </ClInclude>
     <ClInclude Include="helper\texture.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\random.h">
+      <Filter>helper</Filter>
+    </ClInclude>
+    <ClInclude Include="helper\sphere.h">
+      <Filter>helper</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -34,7 +34,14 @@ private:
     GLuint farmerskin = Texture::loadTexture("./media/texture/Casual_male_Albedo.png"); // farmers skin texture
     GLuint barn = Texture::loadTexture("./media/texture/barn.png"); // farmers skin texture
 
-    
+    GLuint fsQuad, fboHandle, renderTex;
+
+    float angle;
+    float tPrev, rotSpeed;
+    void setupFBO();
+    void pass1();
+    void pass2();
+
 
     void setMatrices();
     void compile();
