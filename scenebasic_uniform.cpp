@@ -154,8 +154,8 @@ void SceneBasic_Uniform::render()
 
   //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    view = glm::lookAt(vec3(-8.0f, 6.0f, 0.0f), vec3(-2.0f, -1.0f, 1.0f), vec3(0.0f, 2.0f, 0.0f));
-    view = glm::rotate(view, glm::radians(30.0f * rotation), vec3(0.0f, 1.0f, 0.0f));
+ /*   view = glm::lookAt(vec3(-8.0f, 6.0f, 0.0f), vec3(-2.0f, -1.0f, 1.0f), vec3(0.0f, 2.0f, 0.0f));
+    view = glm::rotate(view, glm::radians(30.0f * rotation), vec3(0.0f, 1.0f, 0.0f));*/
 
    
 }
@@ -206,8 +206,8 @@ void SceneBasic_Uniform::pass1()
     glBindFramebuffer(GL_FRAMEBUFFER, fboHandle);
     glEnable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    view = glm::lookAt(vec3(7.0f * cos(angle), 4.0f, 7.0f * sin(angle)),
-        vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+    view = glm::lookAt(vec3(-8.0f, 6.0f, 0.0f), vec3(-2.0f, -1.0f, 1.0f), vec3(0.0f, 2.0f, 0.0f));
+    view = glm::rotate(view, glm::radians(30.0f * rotation), vec3(0.0f, 1.0f, 0.0f));
     projection = glm::perspective(glm::radians(60.0f), (float)width / height,
         0.3f, 100.0f);
         //This is the pig
