@@ -12,9 +12,10 @@ using std::endl;
 using glm::vec3;
 using glm::mat4;
 
+int sceneChanger = 1;
+
 
 SceneBasic_Uniform::SceneBasic_Uniform() : rotation(5.0f), plane(20.0f, 20.0f, 100, 100){
-
 
     pigmesh = ObjMesh::load("../optimised_developer_tool/media/pig_triangulated.obj",
         true);
@@ -29,65 +30,14 @@ SceneBasic_Uniform::SceneBasic_Uniform() : rotation(5.0f), plane(20.0f, 20.0f, 1
 void SceneBasic_Uniform::initScene()
 {
 
-
     compile();
-    glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
-    glEnable(GL_DEPTH_TEST);
-    projection = mat4(1.0f);
-    angle = glm::pi<float>() / 4.0f;
-    setupFBO();
-    // Array for full-screen quad
-    GLfloat verts[] = {
-    -1.0f, -1.0f, 0.0f, 1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-    -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, -1.0f, 1.0f, 0.0f
-    };
-    GLfloat tc[] = {
-    0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-    0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f
-    };
-    // Set up the buffers
-    unsigned int handle[2];
-    glGenBuffers(2, handle);
-    glBindBuffer(GL_ARRAY_BUFFER, handle[0]);
-    glBufferData(GL_ARRAY_BUFFER, 6 * 3 * sizeof(float), verts, GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, handle[1]);
-    glBufferData(GL_ARRAY_BUFFER, 6 * 2 * sizeof(float), tc, GL_STATIC_DRAW);
-    // Set up the vertex array object
-    glGenVertexArrays(1, &fsQuad);
-    glBindVertexArray(fsQuad);
-    glBindBuffer(GL_ARRAY_BUFFER, handle[0]);
-    glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(0); // Vertex position
-    glBindBuffer(GL_ARRAY_BUFFER, handle[1]);
-    glVertexAttribPointer((GLuint)2, 2, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(2); // Texture coordinates
-    glBindVertexArray(0);
-    prog.setUniform("EdgeThreshold", 0.05f);
-    prog.setUniform("Lights.L", vec3(1.0f));
-    prog.setUniform("Lights.La", vec3(0.2f));
-
-
-
-    /*compile();
-    
-    glEnable(GL_DEPTH_TEST);
-
-    projection = mat4(1.0f);
-
-    prog.setUniform("Lights[0].L", 0.8f, 0.8f, 0.8f);
-    prog.setUniform("Lights[1].L", 0.8f, 0.8f, 0.8f);
-    prog.setUniform("Lights[2].L", 0.8f, 0.8f, 0.8f);
-
-    prog.setUniform("Lights[0].La", 0.5f, 0.5f, 0.5f);
-    prog.setUniform("Lights[1].La", 0.5f, 0.5f, 0.5f);
-    prog.setUniform("Lights[2].La", 0.5f, 0.5f, 0.5f);
-
-   
-    
-    prog.setUniform("Lights[0].Position", 1.0f, 2.0f, 1.0f);
-    prog.setUniform("Lights[1].Position", 3.0f, 1.0f, 1.0f);
-    prog.setUniform("Lights[2].Position", 4.0f, 1.0f, 1.0f);*/
-
+  
+    if (sceneChanger == 0) {
+        initNormal();
+    }
+    else if (sceneChanger == 1) {
+        initEdge();
+    }
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, brick1);
@@ -105,27 +55,39 @@ void SceneBasic_Uniform::initScene()
     glActiveTexture(GL_TEXTURE4);
     glBindTexture(GL_TEXTURE_2D, barn);
 
-
-
 }
 
 void SceneBasic_Uniform::compile()
 {
-    try {
-        prog.compileShader("shader/edge.vert");
-        prog.compileShader("shader/edge.frag");
-        prog.link();
-        prog.use();
+
+    if (sceneChanger == 0) {
+        try {
+            prog.compileShader("shader/basic_uniform.vert");
+            prog.compileShader("shader/basic_uniform.frag");
+            prog.link();
+            prog.use();
+        }
+        catch (GLSLProgramException& e) {
+            cerr << e.what() << endl;
+            exit(EXIT_FAILURE);
+        }
     }
-    catch (GLSLProgramException& e) {
-        cerr << e.what() << endl;
-        exit(EXIT_FAILURE);
+    else if (sceneChanger == 1) {
+        try {
+            prog.compileShader("shader/edge.vert");
+            prog.compileShader("shader/edge.frag");
+            prog.link();
+            prog.use();
+        }
+        catch (GLSLProgramException& e) {
+            cerr << e.what() << endl;
+            exit(EXIT_FAILURE);
+        }
     }
 }
 
 
 void SceneBasic_Uniform::setMatrices() {
-
 
     mat4 mv = view * model;
 
@@ -134,7 +96,6 @@ void SceneBasic_Uniform::setMatrices() {
     prog.setUniform("NormalMatrix", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
 
     prog.setUniform("MVP", projection * mv);
-
 
 }
 
@@ -147,17 +108,12 @@ void SceneBasic_Uniform::update( float t )
 
 void SceneBasic_Uniform::render()
 {
-    pass1();
-    glFlush();
-    pass2();
-
-
-  //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
- /*   view = glm::lookAt(vec3(-8.0f, 6.0f, 0.0f), vec3(-2.0f, -1.0f, 1.0f), vec3(0.0f, 2.0f, 0.0f));
-    view = glm::rotate(view, glm::radians(30.0f * rotation), vec3(0.0f, 1.0f, 0.0f));*/
-
-   
+    if (sceneChanger == 0){
+        renderNormal();
+    }
+    else if (sceneChanger == 1) {
+        renderEdge();
+    }
 }
 
 void SceneBasic_Uniform::resize(int w, int h)
@@ -304,4 +260,155 @@ void SceneBasic_Uniform::pass2()
     glBindVertexArray(fsQuad);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
+}
+
+
+
+void SceneBasic_Uniform::initEdge() {
+
+    glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+    glEnable(GL_DEPTH_TEST);
+    projection = mat4(1.0f);
+    angle = glm::pi<float>() / 4.0f;
+    setupFBO();
+    // Array for full-screen quad
+    GLfloat verts[] = {
+    -1.0f, -1.0f, 0.0f, 1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f,
+    -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, -1.0f, 1.0f, 0.0f
+    };
+    GLfloat tc[] = {
+    0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+    0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f
+    };
+    // Set up the buffers
+    unsigned int handle[2];
+    glGenBuffers(2, handle);
+    glBindBuffer(GL_ARRAY_BUFFER, handle[0]);
+    glBufferData(GL_ARRAY_BUFFER, 6 * 3 * sizeof(float), verts, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, handle[1]);
+    glBufferData(GL_ARRAY_BUFFER, 6 * 2 * sizeof(float), tc, GL_STATIC_DRAW);
+    // Set up the vertex array object
+    glGenVertexArrays(1, &fsQuad);
+    glBindVertexArray(fsQuad);
+    glBindBuffer(GL_ARRAY_BUFFER, handle[0]);
+    glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(0); // Vertex position
+    glBindBuffer(GL_ARRAY_BUFFER, handle[1]);
+    glVertexAttribPointer((GLuint)2, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(2); // Texture coordinates
+    glBindVertexArray(0);
+    prog.setUniform("EdgeThreshold", 0.05f);
+    prog.setUniform("Lights.L", vec3(1.0f));
+    prog.setUniform("Lights.La", vec3(0.2f));
+}
+
+void SceneBasic_Uniform::initNormal() {
+    glEnable(GL_DEPTH_TEST);
+
+    projection = mat4(1.0f);
+
+    prog.setUniform("Lights[0].L", 0.8f, 0.8f, 0.8f);
+    prog.setUniform("Lights[1].L", 0.8f, 0.8f, 0.8f);
+    prog.setUniform("Lights[2].L", 0.8f, 0.8f, 0.8f);
+
+    prog.setUniform("Lights[0].La", 0.5f, 0.5f, 0.5f);
+    prog.setUniform("Lights[1].La", 0.5f, 0.5f, 0.5f);
+    prog.setUniform("Lights[2].La", 0.5f, 0.5f, 0.5f);
+
+
+
+    prog.setUniform("Lights[0].Position", 1.0f, 2.0f, 1.0f);
+    prog.setUniform("Lights[1].Position", 3.0f, 1.0f, 1.0f);
+    prog.setUniform("Lights[2].Position", 4.0f, 1.0f, 1.0f);
+}
+
+
+void SceneBasic_Uniform::renderNormal() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    view = glm::lookAt(vec3(-8.0f, 6.0f, 0.0f), vec3(-2.0f, -1.0f, 1.0f), vec3(0.0f, 2.0f, 0.0f));
+    view = glm::rotate(view, glm::radians(15.0f * rotation), vec3(0.0f, 1.0f, 0.0f));
+
+    //This is the pig
+    prog.setUniform("Material.Kd", 0.4f, 0.4f, 0.4f);
+    prog.setUniform("Material.Ks", 0.9f, 0.9f, 0.9f);
+    prog.setUniform("Material.Ka", 0.5f, 0.5f, 0.5f);
+    prog.setUniform("Material.Shininess", 180.0f);
+    prog.setUniform("Tex1", 1);
+    model = mat4(1.0f);
+    /*model = glm::rotate(model, glm::radians(90.0f), vec3(0.0f, 0.5f, 0.0f));*/
+    model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+    model = glm::translate(model, vec3(4.0f, 4.3f, 0.0f));
+    setMatrices();
+    pigmesh->render();
+
+
+    //This is the farmer
+    prog.setUniform("Material.Kd", 0.4f, 0.4f, 0.4f);
+    prog.setUniform("Material.Ks", 0.9f, 0.9f, 0.9f);
+    prog.setUniform("Material.Ka", 0.5f, 0.5f, 0.5f);
+    prog.setUniform("Material.Shininess", 180.0f);
+    prog.setUniform("Tex1", 3);
+    model = mat4(1.0f);
+    model = glm::rotate(model, glm::radians(90.0f), vec3(0.0f, 0.5f, 0.0f));
+    model = glm::translate(model, vec3(0.0f, 0.5f, 0.0f));
+    setMatrices();
+    farmer->render();
+
+    //This is the barn
+    prog.setUniform("Material.Kd", 0.4f, 0.4f, 0.4f);
+    prog.setUniform("Material.Ks", 0.9f, 0.9f, 0.9f);
+    prog.setUniform("Material.Ka", 0.5f, 0.5f, 0.5f);
+    prog.setUniform("Material.Shininess", 180.0f);
+    prog.setUniform("Tex1", 4);
+    model = mat4(1.0f);
+    model = glm::translate(model, vec3(-6.0f, 3.0f, 0.0f));
+    setMatrices();
+    bluebarn->render();
+
+
+
+    //This is the floor
+    prog.setUniform("Material.Kd", 0.1f, 0.1f, 0.1f);
+    prog.setUniform("Material.Ks", 0.9f, 0.9f, 0.9f);
+    prog.setUniform("Material.Ka", 0.1f, 0.1f, 0.1f);
+    prog.setUniform("Material.Shininess", 180.0f);
+    prog.setUniform("Tex1", 2);
+    model = mat4(1.0f);
+    model = glm::translate(model, vec3(0.0f, -0.45f, 0.0f));
+    setMatrices();
+    plane.render();
+
+
+
+    //These are the cubes
+    prog.setUniform("Material.Ks", 0.0f, 0.0f, 0.0f);
+    prog.setUniform("Material.Shininess", 180.0f);
+    prog.setUniform("Tex1", 0);
+
+    model = mat4(1.0f);
+    model = glm::translate(model, vec3(2.0f, 0.5f, -2.0f));
+    model = glm::rotate(model, glm::radians(15.0f * rotation), vec3(0.0f, 1.0f, 0.0f));
+    setMatrices();
+    cube.render();
+
+    model = mat4(1.0f);
+    model = glm::translate(model, vec3(2.0f, 1.45f, 0.0f));
+    model = glm::rotate(model, glm::radians(15.0f * rotation), vec3(0.0f, 1.0f, 0.0f));
+    setMatrices();
+    cube.render();
+
+
+    model = mat4(1.0f);
+    model = glm::translate(model, vec3(2.0f, 2.0f, 2.0f));
+    model = glm::rotate(model, glm::radians(15.0f * rotation), vec3(0.0f, 1.0f, 0.0f));
+    setMatrices();
+    cube.render();
+}
+
+
+void SceneBasic_Uniform::renderEdge() {
+    pass1();
+    glFlush();
+    pass2();
 }

@@ -53,6 +53,10 @@ public:
     void update( float t );
     void render();
     void resize(int, int);
+    void initEdge();
+    void initNormal();
+    void renderNormal();
+    void renderEdge();
 };
 
 #endif // SCENEBASIC_UNIFORM_H
