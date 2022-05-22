@@ -13,12 +13,13 @@
 #include "helper/texture.h"
 #include <helper/random.h>
 #include <helper/grid.h>
+#include <helper/skybox.h>
 
 
 class SceneBasic_Uniform : public Scene
 {
 private:
-    GLSLProgram prog, flatProg, partProg;
+    GLSLProgram prog, flatProg, partProg, skyProg;
 
     Random rand;
 
@@ -31,6 +32,10 @@ private:
     std::unique_ptr<ObjMesh> bluebarn;
 
     float rotation;
+
+    float angleSky, tPrevSky, rotSpeedSky;
+
+    SkyBox sky;
 
     GLuint pigskin1 = Texture::loadTexture("./media/texture/pinkskin.png"); // pig texture
     GLuint brick1 = Texture::loadTexture("./media/texture/cartoonWall.png"); // cube texture

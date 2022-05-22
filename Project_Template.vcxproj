@@ -166,8 +166,10 @@
     <ClCompile Include="helper\grid.cpp" />
     <ClCompile Include="helper\objmesh.cpp" />
     <ClCompile Include="helper\plane.cpp" />
+    <ClCompile Include="helper\skybox.cpp" />
     <ClCompile Include="helper\sphere.cpp" />
     <ClCompile Include="helper\stb\stb_image.cpp" />
+    <ClCompile Include="helper\stb_image.cpp" />
     <ClCompile Include="helper\teapot.cpp" />
     <ClCompile Include="helper\texture.cpp" />
     <ClCompile Include="helper\torus.cpp" />
@@ -184,6 +186,8 @@
     <None Include="shader\flat_vert.glsl" />
     <None Include="shader\particle.frag" />
     <None Include="shader\particle.vert" />
+    <None Include="shader\skybox.frag" />
+    <None Include="shader\skybox.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="helper\aabb.h" />
@@ -198,6 +202,7 @@
     <ClInclude Include="helper\random.h" />
     <ClInclude Include="helper\scene.h" />
     <ClInclude Include="helper\scenerunner.h" />
+    <ClInclude Include="helper\skybox.h" />
     <ClInclude Include="helper\sphere.h" />
     <ClInclude Include="helper\stb\stb_image.h" />
     <ClInclude Include="helper\stb\stb_image_write.h" />

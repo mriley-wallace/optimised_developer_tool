@@ -13,10 +13,10 @@ using std::endl;
 using glm::vec3;
 using glm::mat4;
 
-int sceneChanger = 1;
+int sceneChanger = 0;
 
 
-SceneBasic_Uniform::SceneBasic_Uniform() : time(0), particleLifetime(50.5f), nParticles(500), emitterPos(1,0,0), emitterDir(-1,2,0),rotation(5.0f), plane(20.0f, 20.0f, 100, 100){
+SceneBasic_Uniform::SceneBasic_Uniform() : time(0), particleLifetime(50.5f), nParticles(500), emitterPos(1,0,0), emitterDir(-1,2,0),rotation(5.0f), plane(20.0f, 20.0f, 100, 100), angleSky(0.0f), tPrevSky(0.0f), rotSpeedSky(glm::pi<float>()/8.0f), sky(100.0f){
 
     pigmesh = ObjMesh::load("../optimised_developer_tool/media/pig_triangulated.obj",
         true);
@@ -61,7 +61,6 @@ void SceneBasic_Uniform::initScene()
     glActiveTexture(GL_TEXTURE5);
     glBindTexture(GL_TEXTURE_2D, smoke);
   
-
 }
 
 void SceneBasic_Uniform::compile()
@@ -79,7 +78,6 @@ void SceneBasic_Uniform::compile()
             partProg.use();
             flatProg.compileShader("shader/flat_frag.glsl");
             flatProg.compileShader("shader/flat_vert.glsl");
-
             flatProg.link();
         }
         catch (GLSLProgramException& e) {
@@ -105,13 +103,12 @@ void SceneBasic_Uniform::compile()
 void SceneBasic_Uniform::setMatrices() {
 
     mat4 mv = view * model;
-
+    prog.use();
     prog.setUniform("ModelViewMatrix", mv);
 
     prog.setUniform("NormalMatrix", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
 
     prog.setUniform("MVP", projection * mv);
-
 }
 
 
@@ -323,6 +320,9 @@ void SceneBasic_Uniform::initEdge() {
 }
 
 void SceneBasic_Uniform::initNormal() {
+
+
+
     glEnable(GL_DEPTH_TEST);
 
     projection = mat4(1.0f);
@@ -343,6 +343,7 @@ void SceneBasic_Uniform::initNormal() {
 
 
     initParticles();
+
 
 }
 
@@ -448,6 +449,10 @@ void SceneBasic_Uniform::renderNormal() {
     glDepthMask(GL_TRUE);
 
 
+
+    
+
+
 }
 
 
@@ -549,6 +554,8 @@ float SceneBasic_Uniform::randFloat() {
 
 void SceneBasic_Uniform::setGLSLMatrices(GLSLProgram& p) {
     mat4 mv = view * model;
+    p.use();
     p.setUniform("MV", mv);
     p.setUniform("Proj", projection);
 }
+
