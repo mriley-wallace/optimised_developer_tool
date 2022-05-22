@@ -8,6 +8,7 @@ using std::endl;
 #include <glm/glm/gtc/matrix_transform.hpp>
 
 #include "helper/glutils.h"
+#include <helper/particleutils.h>
 
 using glm::vec3;
 using glm::mat4;
@@ -15,7 +16,7 @@ using glm::mat4;
 int sceneChanger = 1;
 
 
-SceneBasic_Uniform::SceneBasic_Uniform() : rotation(5.0f), plane(20.0f, 20.0f, 100, 100){
+SceneBasic_Uniform::SceneBasic_Uniform() : time(0), particleLifetime(50.5f), nParticles(500), emitterPos(1,0,0), emitterDir(-1,2,0),rotation(5.0f), plane(20.0f, 20.0f, 100, 100){
 
     pigmesh = ObjMesh::load("../optimised_developer_tool/media/pig_triangulated.obj",
         true);
@@ -34,6 +35,7 @@ void SceneBasic_Uniform::initScene()
   
     if (sceneChanger == 0) {
         initNormal();
+       
     }
     else if (sceneChanger == 1) {
         initEdge();
@@ -55,6 +57,11 @@ void SceneBasic_Uniform::initScene()
     glActiveTexture(GL_TEXTURE4);
     glBindTexture(GL_TEXTURE_2D, barn);
 
+
+    glActiveTexture(GL_TEXTURE5);
+    glBindTexture(GL_TEXTURE_2D, smoke);
+  
+
 }
 
 void SceneBasic_Uniform::compile()
@@ -66,6 +73,14 @@ void SceneBasic_Uniform::compile()
             prog.compileShader("shader/basic_uniform.frag");
             prog.link();
             prog.use();
+            partProg.compileShader("shader/particle.vert");
+            partProg.compileShader("shader/particle.frag");
+            partProg.link();
+            partProg.use();
+            flatProg.compileShader("shader/flat_frag.glsl");
+            flatProg.compileShader("shader/flat_vert.glsl");
+
+            flatProg.link();
         }
         catch (GLSLProgramException& e) {
             cerr << e.what() << endl;
@@ -101,9 +116,12 @@ void SceneBasic_Uniform::setMatrices() {
 
 
 
-void SceneBasic_Uniform::update( float t )
+void SceneBasic_Uniform::update( float t)
 {
     rotation = t;
+    time = t;
+
+    angle = std::fmod(angle + 0.01f, glm::two_pi<float>());
 }
 
 void SceneBasic_Uniform::render()
@@ -158,14 +176,16 @@ void SceneBasic_Uniform::setupFBO()
 
 void SceneBasic_Uniform::pass1()
 {
+    prog.use();
     prog.setUniform("Pass", 1);
     glBindFramebuffer(GL_FRAMEBUFFER, fboHandle);
     glEnable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    view = glm::lookAt(vec3(-8.0f, 6.0f, 0.0f), vec3(-2.0f, -1.0f, 1.0f), vec3(0.0f, 2.0f, 0.0f));
+    view = glm::lookAt(vec3(-10.0f, 10.0f, 0.0f), vec3(-2.0f, -1.0f, 1.0f), vec3(0.0f, 2.0f, 0.0f));
     view = glm::rotate(view, glm::radians(30.0f * rotation), vec3(0.0f, 1.0f, 0.0f));
     projection = glm::perspective(glm::radians(60.0f), (float)width / height,
         0.3f, 100.0f);
+
         //This is the pig
      prog.setUniform("Material.Kd", 0.4f, 0.4f, 0.4f);
     prog.setUniform("Material.Ks", 0.9f, 0.9f, 0.9f);
@@ -297,7 +317,7 @@ void SceneBasic_Uniform::initEdge() {
     glVertexAttribPointer((GLuint)2, 2, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(2); // Texture coordinates
     glBindVertexArray(0);
-    prog.setUniform("EdgeThreshold", 0.05f);
+    prog.setUniform("EdgeThreshold", 0.01f);
     prog.setUniform("Lights.L", vec3(1.0f));
     prog.setUniform("Lights.La", vec3(0.2f));
 }
@@ -306,7 +326,7 @@ void SceneBasic_Uniform::initNormal() {
     glEnable(GL_DEPTH_TEST);
 
     projection = mat4(1.0f);
-
+    prog.use();
     prog.setUniform("Lights[0].L", 0.8f, 0.8f, 0.8f);
     prog.setUniform("Lights[1].L", 0.8f, 0.8f, 0.8f);
     prog.setUniform("Lights[2].L", 0.8f, 0.8f, 0.8f);
@@ -320,16 +340,21 @@ void SceneBasic_Uniform::initNormal() {
     prog.setUniform("Lights[0].Position", 1.0f, 2.0f, 1.0f);
     prog.setUniform("Lights[1].Position", 3.0f, 1.0f, 1.0f);
     prog.setUniform("Lights[2].Position", 4.0f, 1.0f, 1.0f);
+
+
+    initParticles();
+
 }
 
 
 void SceneBasic_Uniform::renderNormal() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    view = glm::lookAt(vec3(-8.0f, 6.0f, 0.0f), vec3(-2.0f, -1.0f, 1.0f), vec3(0.0f, 2.0f, 0.0f));
+    view = glm::lookAt(vec3(-16.0f, 12.0f, 0.0f), vec3(-2.0f, -1.0f, 1.0f), vec3(0.0f, 2.0f, 0.0f));
     view = glm::rotate(view, glm::radians(15.0f * rotation), vec3(0.0f, 1.0f, 0.0f));
 
     //This is the pig
+    prog.use();
     prog.setUniform("Material.Kd", 0.4f, 0.4f, 0.4f);
     prog.setUniform("Material.Ks", 0.9f, 0.9f, 0.9f);
     prog.setUniform("Material.Ka", 0.5f, 0.5f, 0.5f);
@@ -372,7 +397,7 @@ void SceneBasic_Uniform::renderNormal() {
     prog.setUniform("Material.Kd", 0.1f, 0.1f, 0.1f);
     prog.setUniform("Material.Ks", 0.9f, 0.9f, 0.9f);
     prog.setUniform("Material.Ka", 0.1f, 0.1f, 0.1f);
-    prog.setUniform("Material.Shininess", 180.0f);
+    prog.setUniform("Material.Shininess", 1000.0f);
     prog.setUniform("Tex1", 2);
     model = mat4(1.0f);
     model = glm::translate(model, vec3(0.0f, -0.45f, 0.0f));
@@ -404,6 +429,25 @@ void SceneBasic_Uniform::renderNormal() {
     model = glm::rotate(model, glm::radians(15.0f * rotation), vec3(0.0f, 1.0f, 0.0f));
     setMatrices();
     cube.render();
+
+
+    //This is the smoke trail
+    model = mat4(1.0f);
+    model = glm::translate(model, vec3(-7.5f, 6.5f, 1.0f));
+    flatProg.use();
+    setGLSLMatrices(flatProg);
+    grid.render();
+    glDepthMask(GL_FALSE);
+    partProg.use();
+    setGLSLMatrices(partProg);
+    partProg.setUniform("Time", time);
+    partProg.setUniform("ParticleTex", 5);
+    glBindVertexArray(particles);
+    glDrawArraysInstanced(GL_TRIANGLES, 0, 6, nParticles);
+    glBindVertexArray(0);
+    glDepthMask(GL_TRUE);
+
+
 }
 
 
@@ -411,4 +455,100 @@ void SceneBasic_Uniform::renderEdge() {
     pass1();
     glFlush();
     pass2();
+}
+
+void SceneBasic_Uniform::initParticles() {
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_DEPTH_TEST);
+
+    angle = glm::half_pi<float>();
+
+    initBuffers();
+
+
+    partProg.use();
+    partProg.setUniform("ParticleTex", 0);
+    partProg.setUniform("ParticleLifetime", particleLifetime);
+    partProg.setUniform("ParticleSize", 0.05f);
+    partProg.setUniform("Gravity", vec3(0.0f, -0.2f, 0.0f));
+    partProg.setUniform("EmitterPos", emitterPos);
+
+    flatProg.use();
+    flatProg.setUniform("Color", glm::vec4(0.4f, 0.4f, 0.4f, 1.0f));
+   
+}
+
+void SceneBasic_Uniform::initBuffers() {
+
+    glGenBuffers(1, &initVel);
+    glGenBuffers(1, &startTime);
+
+    int size = nParticles * sizeof(float);
+    glBindBuffer(GL_ARRAY_BUFFER, initVel);
+    glBufferData(GL_ARRAY_BUFFER, size * 3, 0, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, startTime);
+    glBufferData(GL_ARRAY_BUFFER, size, 0, GL_STATIC_DRAW);
+
+
+    glm::mat3 emitterBasis = ParticleUtils::makeArbitraryBasis(emitterDir);
+    vec3 v(0.0f);
+    float velocity, theta, phi;
+    std::vector<GLfloat>data(nParticles * 3);
+    for (uint32_t i = 0; i < nParticles; i++) {
+        theta = glm::mix(0.0f, glm::pi<float>() / 20.0f, randFloat());
+        phi = glm::mix(0.0f, glm::two_pi<float>(), randFloat());
+
+        v.x = sinf(theta) * cosf(phi);
+        v.y = cosf(theta);
+        v.z = sinf(theta) * sinf(phi);
+
+
+        velocity = glm::mix(1.25f, 1.5f, randFloat());
+        v = glm::normalize(emitterBasis * v) * velocity;
+
+        data[3 * i] = v.x;
+        data[3 * i + 1] = v.y;
+        data[3 * i + 2] = v.z;
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, initVel);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, size * 3, data.data());
+
+    float rate = particleLifetime / nParticles;
+
+    for (int i = 0; i < nParticles; i++) {
+        data[i] = rate * i;
+    }
+    glBindBuffer(GL_ARRAY_BUFFER, startTime);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, nParticles * sizeof(float), data.data());
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glGenVertexArrays(1, &particles);
+    glBindVertexArray(particles);
+    glBindBuffer(GL_ARRAY_BUFFER, initVel);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, startTime);
+    glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(1);
+
+    glVertexAttribDivisor(0, 1);
+    glVertexAttribDivisor(1, 1);
+
+    glBindVertexArray(0);
+}
+
+float SceneBasic_Uniform::randFloat() {
+    return rand.nextFloat();
+}
+
+void SceneBasic_Uniform::setGLSLMatrices(GLSLProgram& p) {
+    mat4 mv = view * model;
+    p.setUniform("MV", mv);
+    p.setUniform("Proj", projection);
 }

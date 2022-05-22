@@ -1,2 +1,3 @@
 ﻿  scenebasic_uniform.cpp
+C:\Users\midge\Documents\GitHub\optimised_developer_tool\scenebasic_uniform.cpp(522,23): warning C4018: '<': signed/unsigned mismatch
   Project_Template.vcxproj -> C:\Users\midge\Documents\GitHub\optimised_developer_tool\x64\Debug\Project_Template.exe

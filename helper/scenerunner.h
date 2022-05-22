@@ -123,7 +123,7 @@ private:
             scene.update(float(glfwGetTime()));
             scene.render();
             glfwSwapBuffers(window);
-
+            
             glfwPollEvents();
 			int state = glfwGetKey(window, GLFW_KEY_SPACE);
 			if (state == GLFW_PRESS)

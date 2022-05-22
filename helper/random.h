@@ -3,8 +3,8 @@
 
 #include <random>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/constants.hpp>
+#include <glm/glm/glm.hpp>
+#include <glm/glm/gtc/constants.hpp>
 
 class Random {
 private:
