@@ -13,12 +13,12 @@ There are two exectubales:<br/>
 This executable has changed from the original prototype.<br/>
 ---
 This scene now contains smoke above the barn's chimney<br/>
-![Alt Text](https://imgur.com/a/IB7n9oY)
+![Alt Text](https://imgur.com/a/IB7n9oY.gif)
 ---
 
 ##Executable 2 (Edge Detection)<br/>
 This executable outlines the edges of all the objects in the scene<br/>
-![Alt Text](https://imgur.com/a/HzwJZL6)<br/>
+![Alt Text](https://imgur.com/a/HzwJZL6.gif)<br/>
 
 ---
 How it works?<br/>
