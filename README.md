@@ -3,21 +3,21 @@
 
 There are two exectubales:<br/>
 	Make sure you have the folders:<br/>
-		*Dependancies<br/>
-		*helper<br/>
-		*media<br/>
-		*shader<br/>
+		- Dependancies<br/>
+		- helper<br/>
+		- media<br/>
+		- shader<br/>
 ---
 
-##Executable 1 (Main Scene with Particles)<br/>
+## Executable 1 (Main Scene with Particles)<br/>
+
 This executable has changed from the original prototype.<br/>
----
 This scene now contains smoke above the barn's chimney<br/>
 ![Main](https://user-images.githubusercontent.com/55700937/169722992-eee0af3f-2baf-4fd1-9cd7-72a97cdeb330.gif)
 
 ---
 
-##Executable 2 (Edge Detection)<br/>
+## Executable 2 (Edge Detection)<br/>
 This executable outlines the edges of all the objects in the scene<br/>
 
 ![Edge](https://user-images.githubusercontent.com/55700937/169722892-805a23da-5fee-4437-8ce3-39c523e76150.gif)
@@ -30,8 +30,8 @@ The two executables were built by simply changing the "int sceneChanger = 0;" in
 
 ---
 
-##Program Code<br/>
-###Main Scene Particles<br/>
+## Program Code<br/>
+### Main Scene Particles<br/>
 The particles uses its own separate program called partProg to specify the shaders being used.<br/>
 The particles use a vector 3 of gravity to specify where in the world space the end goal is (which is y -2)<br/>
 They also contain parameters in the shaders for lifetime and size.<br/>
@@ -40,7 +40,9 @@ Over a length of time (t) the angle of descent to Gravity corresponds to two pi.
 The lookAt view was also extended backwards to show more of the terrain to see the whole barn.<br/>
 
 ---
-###Edge Detection<br/>
+### Edge Detection<br/>
+Using a two-pass algorithm we first render the image to the texture, then in the second pass, we apply a filter by reading the texture<br/>
+and sending the filtered results back to the screen. Using an FBO, we retrieve the values of the eight neighbouring pixels of the texture and compute their brightness<br/>
 
 
 ---
@@ -51,13 +53,13 @@ It also provides that next level of detail towards the ambience which helps brin
 
 ---
 
-##Start?<br/>
+## Start?<br/>
 I started with the original program from the prototype which included all the 3D objects and the plane.<br/>
 Since then I have added alot more shaders, refactored the code, created multiple programs to run the shaders,<br/>
 as well as bug testing to ensure everything worked correctly.<br/>
 
 
-##Video<br/>
+## Video<br/>
 
 • How does the program code work? How do the classes and functions fit together and who
 does what?
