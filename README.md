@@ -61,7 +61,5 @@ as well as bug testing to ensure everything worked correctly.<br/>
 
 ## Video<br/>
 
-• How does the program code work? How do the classes and functions fit together and who
-does what?
-
+https://www.youtube.com/watch?v=lPdjYxjbYYE
 
